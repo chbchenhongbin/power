@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.power.chb.mapper.sys.SysDeptMapper" >
+
+      <sql id="Base_Column_List" >
+          id, name, parent_id, level, seq, remark, operator, create_time, operate_ip
+      </sql>
+
+    <select id="getChildDeptListByLevel"  resultType="com.power.chb.model.sys.SysDept">
+        select
+        <include refid="Base_Column_List" />
+        from sys_dept
+        WHERE level like CONCAT(CONCAT(#{level} ,'.%'))
+    </select>
+
+    <update id="batchUpdateLevel" parameterType="map">
+            UPDATE sys_dept
+            SET level = #{level}
+            WHERE id = #{id}
+    </update>
+
+
+</mapper>

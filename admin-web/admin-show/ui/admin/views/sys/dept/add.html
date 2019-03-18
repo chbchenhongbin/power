@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>部门管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../../layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="../../../layuiadmin/style/my/style.css" media="all">
+</head>
+
+<body>
+
+  <div class="layui-fluid" id="LAY-component-grid-mobile" ms-controller="add">
+
+    <div class="layui-row layui-col-space10">
+      <div class="layui-col-sm12">
+        <div class="layui-card">
+          <div class="layui-card-body">
+
+            <form class="layui-form">
+              <div class="layui-form-item">
+                <label class="layui-form-label">上级部门</label>
+                <div class="layui-input-block">
+                  <input type="hidden" id="parentId"  name="parentId" :duplex="@deptData.id"/>
+                  <input type="text"  style="width: 400px"  readonly="true" :click="@selectDeptTree()"  :duplex="@deptData.name" required  lay-verify="required" placeholder="请选择上级部门" autocomplete="off" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">部门名称</label>
+                <div class="layui-input-block">
+                  <input type="text" name="name"  style="width: 400px" placeholder="请选择部门名称" lay-verify="required" class="layui-input">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label">显示排序</label>
+                <div class="layui-input-inline">
+                  <input type="number" name="seq"  style="width: 200px" placeholder="显示排序" lay-verify="required" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">部门在当前层级下的顺序，由小到大</div>
+              </div>
+
+
+              <div class="layui-form-item">
+                <label class="layui-form-label">部门状态</label>
+                <div class="layui-input-block">
+                  <input type="checkbox" name="switch" lay-skin="switch" checked>
+                </div>
+              </div>
+              <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">描述</label>
+                <div class="layui-input-block">
+                  <textarea placeholder="请输入内容" name="remark" class="layui-textarea"></textarea>
+                </div>
+              </div>
+
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+                  <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+              </div>
+            </form>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../../../layuiadmin/js/jquery.min.js"></script>
+  <script src="../../../layuiadmin/js/base.js"></script>
+  <script src="../../../layuiadmin/layui/layui.all.js"></script>
+  <script src="../../../layuiadmin/js/jquery.cookie.js"></script>
+  <script src="../../../layuiadmin/js/ax.js"></script>
+  <script src="../../../layuiadmin/js/avalon.js"></script>
+  <script>
+
+    /********* vm 加载 **********/
+    var vm = avalon.define({
+      $id: "add",
+      layer: layui.layer,
+      table: layui.table,
+      form: layui.form,
+
+      deptData:{
+            id:0,
+            name:"",
+
+      },
+
+      /*部门管理-新增-选择父部门树*/
+      selectDeptTree:function () {
+
+        layer.open({
+          type: 2,
+          title: '添加部门',
+          area: ['30%', '70%'],
+          fixed: true, //不固定
+          content: '../tree/deptTree.html',
+          success: function (layero, index) {
+
+          }
+        });
+
+      },
+
+      submit:function(){
+        //总校立即提交
+        vm.form.on('submit(submit)', function (data) {
+          vm.toSubmit(data.field);
+          return false;
+        });
+      },
+
+      toSubmit:function (data) {
+        //验证 todo
+        ax.post({
+          async:false,
+          url: adminUrl + "/api/dept/save",
+          data: data,
+          contentType: "application/x-www-form-urlencoded",
+          success: function (data) {
+            if (data.code == 0) {
+              //刷新父页面
+              showMsg(data.message,'添加成功',6);
+              window.parent.location.reload();//刷新父页面
+              parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }else {
+              showMsg(data.message,5);
+            }
+          },
+          error:function (data) {
+            showMsg(data.responseJSON.message,5);
+          }
+        });
+      }
+
+    });
+
+
+
+    vm.$watch('onReady', function (){
+
+      vm.submit();
+
+    });
+
+
+    //子窗口调用
+    function addDeptValue(v){
+        vm.deptData.id=v.id;
+        vm.deptData.name=v.name;
+    }
+
+  </script>
+</body>
+</html>

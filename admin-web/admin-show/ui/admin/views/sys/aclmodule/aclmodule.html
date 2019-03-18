@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>权限管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../../layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="../../../layuiadmin/js/zTree_v3/css/zTreeStyle/zTreeStyle-01.css" type="text/css">
+</head>
+<body>
+
+  <style>
+  /* 这段样式只是用于演示 */
+  #LAY-component-grid-all .layui-card-body{display: flex; flex-direction: column; height: 520px;}
+  </style>
+
+  <div class="layui-fluid" id="LAY-component-grid-all" ms-controller="aclTree">
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-xs6 layui-col-sm5 layui-col-md3">
+          <div class="layui-card">
+            <div class="layui-card-header">权限管理</div>
+            <div class="layui-card-body">
+                  <ul class="ztree" id="treeDemo"></ul>
+            </div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm7 layui-col-md9">
+          <div class="layui-card">
+            <div class="layui-card-header">权限详情   ---  {{ aclModule.aclName }}</div>
+            <div class="layui-card-body">
+
+              <div>
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="update">修改</button>
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
+              </div>
+              <hr>
+
+              <form class="layui-form  layui-form-pane">
+                <div class="layui-form-item layui-row layui-col-space10">
+                  <div class="layui-col-md3 layui-col-sm6">
+                    <label class="layui-form-label">权限名称</label>
+                    <div class="layui-input-block">
+                      <input type="text"  ms-duplex="@aclModule.aclName"  autocomplete="off" class="layui-input"  disabled="disabled">
+                    </div>
+                  </div>
+
+                  <div class="layui-col-md4 layui-col-sm6">
+                    <label class="layui-form-label">创建时间</label>
+                    <div class="layui-input-block">
+                      <input type="text" ms-duplex="@aclModule.createTime"   autocomplete="off" class="layui-input" disabled="disabled">
+                    </div>
+                  </div>
+
+                  <div class="layui-col-md3 layui-col-sm6">
+                    <label class="layui-form-label">顺序</label>
+                    <div class="layui-input-block">
+                      <input type="text" ms-duplex="@aclModule.seq"  autocomplete="off" class="layui-input" disabled="disabled">
+                    </div>
+                  </div>
+
+
+                </div>
+
+                <div class="layui-form-item layui-row layui-col-space10">
+                  <div class="layui-col-md3 layui-col-sm6">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                      <textarea type="text" ms-duplex="@aclModule.remark"  autocomplete="off" class="layui-input" disabled="disabled"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </form>
+
+              <hr>
+
+              
+
+            </div>
+
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <script src="../../../layuiadmin/js/jquery.min.js"></script>
+  <script src="../../../layuiadmin/js/base.js"></script>
+  <script src="../../../layuiadmin/layui/layui.all.js"></script>
+  <script src="../../../layuiadmin/js/jquery.cookie.js"></script>
+  <script src="../../../layuiadmin/js/ax.js"></script>
+  <script type="text/javascript" src="../../../layuiadmin/js/zTree_v3/js/jquery.ztree.core.js"></script>
+  <script type="text/javascript" src="../../../layuiadmin/js/zTree_v3/js/jquery.ztree.excheck.js"></script>
+  <script type="text/javascript" src="../../../layuiadmin/js/zTree_v3/js/jquery.ztree.exedit.js"></script>
+  <script src="../../../layuiadmin/js/avalon.js"></script>
+
+  <script>
+  // layui.config({
+  //   base: '../../../layuiadmin/' //静态资源所在路径
+  // }).extend({
+  //   index: 'lib/index' //主入口模块
+  // }).use(['index']);
+
+  /********* vm 加载 **********/
+  var vm = avalon.define({
+    $id: "aclTree",
+
+    aclModule:{
+      aclId:'',
+      aclName:"请选择权限",
+      createTime:'',
+      remark:'',
+      seq:''
+
+    },
+    //初始化权限树
+    initTree:function () {
+      ax.get({
+        type: "get",
+        url: adminUrl + "/api/aclModule/tree",
+        success: function (data) {
+          console.log(data)
+          var treeObj = $.fn.zTree.init($("#treeDemo"), setting, data.data); //加载数据
+          treeObj.expandAll(true);//默认展开
+        }
+      });
+    },
+
+    intAclModuleData:function (id) {
+      ax.get({
+        url: adminUrl + "/api/aclModule/info"+"?id="+id,
+        success: function (data) {
+          var data=data.data;
+          console.log("show: "+data.id)
+          vm.aclModule.aclId=data.id;
+          vm.aclModule.aclName=data.name;
+          vm.aclModule.createTime=data.createTime;
+          vm.aclModule.remark=data.remark;
+          vm.aclModule.seq=data.seq;
+        }
+      })
+    }
+  });
+
+  var setting = {
+    data: {
+      simpleData: {
+        enable: true,
+        idKey: "id",//节点id
+        pIdKey: "parentId",//父节点id
+      }
+    },
+    callback: {
+      onClick: onClick
+    }
+  };
+
+  function onClick(event, treeId, treeNode, clickFlag) {
+    vm.aclModule.aclName=treeNode.name;
+    vm.intAclModuleData(treeNode.id);
+  }
+
+  vm.$watch('onReady', function (){
+    vm.initTree();
+  });
+
+
+  </script>
+
+
+
+</body>
+</html>

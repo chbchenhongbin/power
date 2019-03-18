@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.power.chb.mapper.sys.SysUserMapper" >
+
+    <!--修改学员信息-->
+    <update id="updateUser" parameterType="com.power.chb.model.sys.SysUser">
+         update sys_user
+         <set>
+             <if test="userName != null ">`user_name` = #{userName}, </if>
+             <if test="telephone != null and telephone!='' ">`telephone` = #{telephone}, </if>
+             <if test="mail != null and mail!='' ">`mail` = #{mail}, </if>
+             <if test="password != null and password!='' ">`password` = #{password}, </if>
+             <if test="deptId != null and deptId!='' ">`dept_id` = #{deptId}, </if>
+             <if test="status != null and status!='' ">`status` = #{status}, </if>
+             <if test="remark != null and remark!='' ">`remark` = #{remark}, </if>
+             <if test="operator != null and operator!='' ">`operator` = #{operator}, </if>
+             <if test="operateIp != null and operateIp!='' ">`operate_ip` = #{operateIp}, </if>
+             <if test="createTime != null ">`create_time` = #{createTime}, </if>
+             <if test="updateTime != null ">`update_time` = #{updateTime}</if>
+         </set>
+         where id = #{id}
+    </update>
+
+
+</mapper>

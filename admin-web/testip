@@ -1,1 +1,1 @@
-testmyip=$myip
+testmyip=${myip}

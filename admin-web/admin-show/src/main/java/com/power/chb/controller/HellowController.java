@@ -19,7 +19,7 @@ public class HellowController {
     @RequestMapping(value = "/hello")
     public ResultEntity<String> hello() {
 
-        return ResultEntity.success("aaaaa",0);
+        return ResultEntity.success("年晒得盛大的",0);
     }
 
 
